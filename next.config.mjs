@@ -25,9 +25,9 @@ const nextConfig = {
             },
         ]
     },
-    // experimental: {
-    //     swcPlugins: [["@preact-signals/safe-react/swc", {}]],
-    // },
+    experimental: {
+        serverComponentsExternalPackages: ["lz4"],  // <-add this
+    },
 };
 
 export default nextConfig;

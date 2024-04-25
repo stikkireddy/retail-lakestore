@@ -16,7 +16,8 @@ export default function ProductDetails() {
     useSignals()
     const title = openSignal.value?.name
     const description = openSignal.value?.providedDescription ?? "No description provided."
-    const labelString = `Labels: ${(openSignal.value?.labels?.join(",") ?? "")}\nProduct ID: ${openSignal.value?.id}\nRetailer: ${openSignal.value?.retailer}`
+    const aiGeneratedDescription = openSignal.value?.aiGeneratedDescription ?? "No AI generated description available."
+    const labelString = `Labels: ${(openSignal.value?.labels?.join(",") ?? "")}, Product ID: ${openSignal.value?.id}, Retailer: ${openSignal.value?.retailer}`
     return (
         <Card>
             <CardHeader>
@@ -42,7 +43,16 @@ export default function ProductDetails() {
                         <Textarea
                             id="description"
                             defaultValue={description}
-                            className="min-h-32"
+                            className="h-16"
+                            disabled
+                        />
+                    </div>
+                    <div className="grid gap-3">
+                        <Label htmlFor="aiDescription">AI Generated Description</Label>
+                        <Textarea
+                            id="aiDescription"
+                            defaultValue={aiGeneratedDescription}
+                            className="h-16"
                             disabled
                         />
                     </div>
@@ -51,7 +61,7 @@ export default function ProductDetails() {
                         <Textarea
                             id="description"
                             defaultValue={labelString}
-                            className="min-h-32"
+                            className="min-h-8"
                             disabled
                         />
                     </div>

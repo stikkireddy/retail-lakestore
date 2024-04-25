@@ -113,7 +113,7 @@ export default function ProductEditView() {
                 </AccordionContent>
             </AccordionItem>
             <AccordionItem value="product-copy">
-                <AccordionTrigger>Generate Product Copy</AccordionTrigger>
+                <AccordionTrigger>Live Product Copy Generation</AccordionTrigger>
                 <AccordionContent>
                     <Card className="w-full h-full">
                         <CardHeader>

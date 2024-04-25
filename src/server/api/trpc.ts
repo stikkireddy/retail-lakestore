@@ -9,6 +9,8 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import {DBSQLClient} from "@databricks/sql";
+import {env} from "@/env";
 
 /**
  * 1. CONTEXT
@@ -23,8 +25,17 @@ import { ZodError } from "zod";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const client: DBSQLClient = new DBSQLClient();
+  const connectOptions = {
+    token: env.DATABRICKS_DATA_TOKEN,
+    host:  env.DATABRICKS_DATA_SERVER_HOSTNAME,
+    path:  env.DATABRICKS_DATA_HTTP_PATH
+  };
+
+  client.connect(connectOptions)
   return {
     ...opts,
+    sqlClient: client,
   };
 };
 

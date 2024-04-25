@@ -10,6 +10,10 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]),
     DATABRICKS_OPENAI_URL: z.string(),
     DATABRICKS_OPENAI_TOKEN: z.string(),
+    DATABRICKS_DATA_SERVER_HOSTNAME: z.string(),
+    DATABRICKS_DATA_TOKEN: z.string(),
+    DATABRICKS_DATA_HTTP_PATH: z.string(),
+    DATABRICKS_VECTOR_INDEX_NAME: z.string(),
   },
 
   /**
@@ -29,7 +33,10 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     DATABRICKS_OPENAI_URL: process.env.DATABRICKS_OPENAI_URL,
     DATABRICKS_OPENAI_TOKEN: process.env.DATABRICKS_OPENAI_TOKEN,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    DATABRICKS_DATA_SERVER_HOSTNAME: process.env.DATABRICKS_DATA_SERVER_HOSTNAME,
+    DATABRICKS_DATA_TOKEN: process.env.DATABRICKS_DATA_TOKEN,
+    DATABRICKS_DATA_HTTP_PATH: process.env.DATABRICKS_DATA_HTTP_PATH,
+    DATABRICKS_VECTOR_INDEX_NAME: process.env.DATABRICKS_VECTOR_INDEX_NAME,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

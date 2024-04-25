@@ -14,6 +14,7 @@ export const productSchema = z.object({
   imageDescription: z.string().optional(),
   providedDescription: z.string().optional(),
   retailer: z.string().optional(),
+  aiGeneratedDescription: z.string().optional(),
 })
 
 export type Product = z.infer<typeof productSchema>
