@@ -25,6 +25,7 @@ const nextConfig = {
             },
         ]
     },
+    output: "standalone",
     experimental: {
         serverComponentsExternalPackages: ["lz4"],  // <-add this
     },
