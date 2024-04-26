@@ -50,8 +50,9 @@ export const columns: ColumnDef<Product>[] = [
                 return <div className="w-[80px]"></div>
             }
             const labels = row.getValue("labels") as string[]
-            const labelBadges = labels.map((label, idx) => <Badge key={idx} variant="secondary">{label}</Badge>)
-            return <div className="w-[80px]">{...labelBadges}</div>
+            const labelBadges = labels.map((label, idx) => <Badge key={idx}
+                                                                  className={"m-1"} variant="outline">{label}</Badge>)
+            return <div className="w-[180px]">{...labelBadges}</div>
         },
         enableSorting: false,
         enableHiding: false,
