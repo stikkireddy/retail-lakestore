@@ -12,6 +12,7 @@ import {Product} from "@/components/product-view/schema/schema";
 import {Skeleton} from "@/components/ui/skeleton";
 import {api} from "@/trpc/react";
 import {ProductDBModel} from "@/server/api/routers/product";
+import {openSignal} from "@/components/product-view/product-copy-edit-view";
 
 function useDebounce(value: string, delay: number) {
     // only update debounced value if value changes
@@ -169,7 +170,12 @@ export function Dashboard() {
                             <Separator/>
                             <div className={"pt-2"}>
                                 <DataTable columns={loadingProducts ? loadingColumns : columns}
-                                           data={loadingProducts ? loadingFakeData : products}/>
+                                           data={loadingProducts ? loadingFakeData : products}
+                                            onRowClick={(row) => {
+                                                if(!loadingProducts) {
+                                                    openSignal.value = row
+                                                }
+                                            }}/>
                             </div>
                         </CardContent>
                     </Card>

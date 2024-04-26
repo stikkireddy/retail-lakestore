@@ -31,8 +31,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     host:  env.DATABRICKS_DATA_SERVER_HOSTNAME,
     path:  env.DATABRICKS_DATA_HTTP_PATH
   };
-
-  client.connect(connectOptions)
+  await client.connect(connectOptions)
   return {
     ...opts,
     sqlClient: client,

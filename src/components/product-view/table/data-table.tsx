@@ -31,12 +31,14 @@ import {ProductEditModal} from "@/components/product-view/product-copy-edit-view
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    data: TData[],
+    onRowClick: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
                                              columns,
                                              data,
+                                             onRowClick,
                                          }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] =
@@ -104,6 +106,7 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    onClick={() => onRowClick(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id} className={cell.column.id === "url" ? "w-[92px] h-[92px] !p-0.5" : ""}>

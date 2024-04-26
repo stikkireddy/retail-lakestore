@@ -1,6 +1,7 @@
 import {z} from "zod";
 import {createTRPCRouter, publicProcedure} from "@/server/api/trpc";
 import {env} from "@/env";
+import {unstable_cache} from "next/cache";
 
 const productDBSchema = z.object({
     RETAILER_PRODUCT_ID: z.string(),
@@ -60,20 +61,26 @@ const fetchData = async (searchQuery: string, numResults: number = 50) => {
 export const productRouter = createTRPCRouter({
     list: publicProcedure
         .query(async ({ctx}) => {
-            const session = await ctx.sqlClient.openSession();
-            const query = await session.executeStatement(
-                `SELECT * 
+            const getCachedProducts = unstable_cache(
+                async () => {
+                    const session = await ctx.sqlClient.openSession();
+                    const query = await session.executeStatement(
+                        `SELECT * 
                             FROM ${env.DATABRICKS_PRODUCT_TABLE} 
                             ORDER BY RETAILER_PRODUCT_NAME 
                             LIMIT 10000`,
-                {
-                    maxRows: 10000 // This option enables the direct results feature.
-                })
-            const result = await query.fetchAll();
-            await query.close()
-            const resp = result.map((row) => productDBSchema.parse(row))
-            await session.close()
-            return resp
+                        {
+                            maxRows: 10000 // This option enables the direct results feature.
+                        })
+                    const result = await query.fetchAll();
+                    await query.close()
+                    const resp = result.map((row) => productDBSchema.parse(row))
+                    await session.close()
+                    return resp
+                },
+                ['products-list'],
+            );
+            return await getCachedProducts()
         }),
     search: publicProcedure
         .input(z.object({
