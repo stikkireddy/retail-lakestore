@@ -87,3 +87,16 @@ export const productRouter = createTRPCRouter({
             return null
         })
 })
+
+export const productSchema = z.object({
+    RETAILER_PRODUCT_ID: z.string(),
+    RETAILER_PRODUCT_NAME: z.string().optional(),
+    RETAILER_PRODUCT_URL: z.string().optional(),
+    RETAILER_IMAGE: z.string().optional(),
+    CATEGORY: z.string().optional(),
+    DESCRIPTION: z.string().optional(),
+    IMAGE_DESCRIPTION: z.string().optional(),
+    RETAILER: z.string().optional(),
+});
+
+export type Product = z.infer<typeof productSchema>;
