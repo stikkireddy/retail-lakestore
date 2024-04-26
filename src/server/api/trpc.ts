@@ -25,16 +25,8 @@ import {env} from "@/env";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const client: DBSQLClient = new DBSQLClient();
-  const connectOptions = {
-    token: env.DATABRICKS_DATA_TOKEN,
-    host:  env.DATABRICKS_DATA_SERVER_HOSTNAME,
-    path:  env.DATABRICKS_DATA_HTTP_PATH
-  };
-  await client.connect(connectOptions)
   return {
     ...opts,
-    sqlClient: client,
   };
 };
 

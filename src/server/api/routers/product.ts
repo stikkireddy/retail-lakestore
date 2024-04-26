@@ -2,6 +2,7 @@ import {z} from "zod";
 import {createTRPCRouter, publicProcedure} from "@/server/api/trpc";
 import {env} from "@/env";
 import {unstable_cache} from "next/cache";
+import {DBSQLClient} from "@databricks/sql";
 
 const productDBSchema = z.object({
     RETAILER_PRODUCT_ID: z.string(),
@@ -58,28 +59,37 @@ const fetchData = async (searchQuery: string, numResults: number = 50) => {
         .catch((error) => console.error(error));
 }
 
-export const productRouter = createTRPCRouter({
-    list: publicProcedure
-        .query(async ({ctx}) => {
-            const getCachedProducts = unstable_cache(
-                async () => {
-                    const session = await ctx.sqlClient.openSession();
-                    const query = await session.executeStatement(
-                        `SELECT * 
+const getCachedProducts = unstable_cache(
+    async () => {
+        const client: DBSQLClient = new DBSQLClient();
+        const connectOptions = {
+            token: env.DATABRICKS_DATA_TOKEN,
+            host:  env.DATABRICKS_DATA_SERVER_HOSTNAME,
+            path:  env.DATABRICKS_DATA_HTTP_PATH
+        };
+        await client.connect(connectOptions)
+        const session = await client.openSession();
+        const query = await session.executeStatement(
+            `SELECT * 
                             FROM ${env.DATABRICKS_PRODUCT_TABLE} 
                             ORDER BY RETAILER_PRODUCT_NAME 
                             LIMIT 10000`,
-                        {
-                            maxRows: 10000 // This option enables the direct results feature.
-                        })
-                    const result = await query.fetchAll();
-                    await query.close()
-                    const resp = result.map((row) => productDBSchema.parse(row))
-                    await session.close()
-                    return resp
-                },
-                ['products-list'],
-            );
+            {
+                maxRows: 10000 // This option enables the direct results feature.
+            })
+        console.log("Fetched products from dbsql.")
+        const result = await query.fetchAll();
+        await query.close()
+        const resp = result.map((row) => productDBSchema.parse(row))
+        await session.close()
+        return resp
+    },
+    ['products-list'],
+);
+
+export const productRouter = createTRPCRouter({
+    list: publicProcedure
+        .query(async () => {
             return await getCachedProducts()
         }),
     search: publicProcedure
