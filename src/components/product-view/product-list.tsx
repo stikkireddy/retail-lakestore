@@ -40,7 +40,7 @@ function dataToViewModel(data: ProductDBModel): Product {
         totalSales: 0,
         createdAt: "2024-01-01",
         url: data.RETAILER_IMAGE ?? "",
-        labels: data.CATEGORY ? [data.CATEGORY] : undefined,
+        labels: data.CATEGORY ? [...data.CATEGORY.split(",")] : undefined,
         imageDescription: data.IMAGE_DESCRIPTION ?? "",
         providedDescription: data.DESCRIPTION ?? "",
         retailer: data.RETAILER ?? "",

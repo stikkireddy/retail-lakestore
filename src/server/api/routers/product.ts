@@ -32,9 +32,7 @@ const fetchData = async (searchQuery: string, numResults: number = 50) => {
 
     const raw = JSON.stringify({
         "num_results": numResults,
-        "columns": [
-            "Retailer_Product_ID"
-        ],
+        "columns": env.DATABRICKS_VECTOR_INDEX_COLUMNS.split(","),
         "query_text": searchQuery
     });
 
@@ -65,7 +63,7 @@ export const productRouter = createTRPCRouter({
             const session = await ctx.sqlClient.openSession();
             const query = await session.executeStatement(
                 `SELECT * 
-                            FROM mars_data_day.products.product_details_vw 
+                            FROM ${env.DATABRICKS_PRODUCT_TABLE} 
                             ORDER BY RETAILER_PRODUCT_NAME 
                             LIMIT 10000`,
                 {
@@ -80,7 +78,7 @@ export const productRouter = createTRPCRouter({
     search: publicProcedure
         .input(z.object({
             searchQuery: z.string(),
-            numResults: z.number().optional().default(50)
+            numResults: z.number().optional().default(10)
         }))
         .query(async ({input}) => {
             if (input.searchQuery.length > 0) {
