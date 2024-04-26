@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-Make sure you have node v20. You install the right version using nvm.
+Make sure you have node v18 and pnpm. You can install the right version using nvm.
 
 Install all the deps:
 
@@ -10,9 +10,11 @@ Install all the deps:
 make install
 ```
 
+Fill out the .env file with the right values; you can use the example as a form.
+
 Run the local server:
 
-```
+```bash
 make run
 ```
 
