@@ -5,6 +5,19 @@ import {unstable_cache} from "next/cache";
 import {DBSQLClient} from "@databricks/sql";
 import {PorterStemmer, TfIdf, WordTokenizer} from 'natural';
 
+export const productSchema = z.object({
+    RETAILER_PRODUCT_ID: z.string(),
+    RETAILER_PRODUCT_NAME: z.string().optional(),
+    RETAILER_PRODUCT_URL: z.string().optional(),
+    RETAILER_IMAGE: z.string().optional(),
+    CATEGORY: z.string().optional(),
+    DESCRIPTION: z.string().optional(),
+    IMAGE_DESCRIPTION: z.string().optional(),
+    RETAILER: z.string().optional(),
+});
+
+export type Product = z.infer<typeof productSchema>;
+
 const productDBSchema = z.object({
     RETAILER_PRODUCT_ID: z.string(),
     RETAILER_PRODUCT_NAME: z.string().optional().nullable(),
@@ -125,7 +138,7 @@ const searchProducts = async (searchQuery: string, numResults: number = 10) => {
     })
 }
 
-function rrf(results1: ProductSearchResults, results2: ProductSearchResults, m = 60, numResults: number) {
+const rrf = (results1: ProductSearchResults, results2: ProductSearchResults, m = 60, numResults: number) => {
     const scores = new Map<string, number>()
     // this assumes that the results come in presorted in priority order
     const addScores = (array: string[], scoresMap: Map<string, number>) => {
@@ -173,16 +186,3 @@ export const productRouter = createTRPCRouter({
             return null
         })
 })
-
-export const productSchema = z.object({
-    RETAILER_PRODUCT_ID: z.string(),
-    RETAILER_PRODUCT_NAME: z.string().optional(),
-    RETAILER_PRODUCT_URL: z.string().optional(),
-    RETAILER_IMAGE: z.string().optional(),
-    CATEGORY: z.string().optional(),
-    DESCRIPTION: z.string().optional(),
-    IMAGE_DESCRIPTION: z.string().optional(),
-    RETAILER: z.string().optional(),
-});
-
-export type Product = z.infer<typeof productSchema>;
