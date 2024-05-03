@@ -15,6 +15,7 @@ import {api} from "@/trpc/react";
 import {ProductDBModel} from "@/server/api/routers/product";
 import {openSignal, ProductEditModal} from "@/components/product-view/product-copy-edit-view";
 import {displayForecastSignal, ProductForecastModal} from "@/components/forecast-view/forecast";
+import {cn} from "@/lib/utils";
 
 function useDebounce(value: string, delay: number) {
     // only update debounced value if value changes
@@ -81,6 +82,19 @@ function shuffleArray(array: Product[], seed: number) {
     return array;
 }
 
+export function Disclaimer({
+    className
+                           }: {
+    className?: string
+}) {
+    return (
+        <span className={cn("text-xs text-muted-foreground", className)}>
+            This is a demo of a product list page. The data is randomly generated and does not reflect real products.
+            This data was generated using a kaggle dataset and does not reflect real brands or products.
+        </span>
+
+    )
+}
 
 export function ProductList() {
     const [_, setProductType] = useState("Draft")
@@ -172,7 +186,8 @@ export function ProductList() {
                         <CardHeader>
                             <CardTitle>Draft Products</CardTitle>
                             <CardDescription>
-                                Manage your draft products and generate product copy.
+                                Manage your draft products and generate product copy.<br/>
+                                <Disclaimer className={"pt-2"}/>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -218,7 +233,8 @@ export function ProductList() {
                         <CardHeader>
                             <CardTitle>Active Products</CardTitle>
                             <CardDescription>
-                                Manage your active products and see visualize the forecasts.
+                                Manage your active products and visualize the forecasts.<br/>
+                                <Disclaimer className={"pt-2"}/>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

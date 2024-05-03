@@ -3,6 +3,7 @@ import {createTRPCRouter, publicProcedure} from "@/server/api/trpc";
 import {env} from "@/env";
 import {unstable_cache} from "next/cache";
 import {DBSQLClient} from "@databricks/sql";
+import {TfIdf} from 'natural';
 
 const productDBSchema = z.object({
     RETAILER_PRODUCT_ID: z.string(),
@@ -55,8 +56,7 @@ const fetchData = async (searchQuery: string, numResults: number = 50) => {
                 columns: columns,
                 results: results
             })
-        })
-        .catch((error) => console.error(error));
+        });
 }
 
 const getCachedProducts = unstable_cache(
@@ -92,6 +92,63 @@ const searchQuery = z.object({
     numResults: z.number().default(10)
 })
 
+const getTFIDF = async () => {
+        const tfidf = new TfIdf();
+        const products = await getCachedProducts()
+        products.forEach((product) => {
+            if (product.RETAILER_PRODUCT_NAME) {
+                tfidf.addDocument(product.RETAILER_PRODUCT_NAME.toLowerCase(), product.RETAILER_PRODUCT_ID)
+            }
+        })
+        return tfidf
+    }
+
+const searchProducts = async (searchQuery: string, numResults: number = 10) => {
+    const search = await getTFIDF()
+    let scores: {i: number, measure: number, key: string | Record<string, any> | undefined}[] = []
+    search.tfidfs(searchQuery.toLowerCase(), (i, measure, key) => {
+        scores.push({i, measure, key})
+    })
+    scores = scores.sort((a, b) => b.measure - a.measure)
+    scores = scores.slice(0, numResults).filter((score) => score.measure > 0)
+    console.log("Computed text scores!")
+    return productSemanticSearchResults.parse({
+        numResults: scores.length,
+        columns: ["RETAILER_PRODUCT_ID"],
+        results: scores.map((score) => score.key as string)
+    })
+}
+
+function rrf(results1: ProductSearchResults, results2: ProductSearchResults, m = 60, numResults: number) {
+    const scores = new Map<string, number>()
+    // this assumes that the results come in presorted in priority order
+    const addScores = (array: string[], scoresMap: Map<string, number>) => {
+        array.forEach((item, index) => {
+            // start rank at 1
+            const rank = index + 1;
+            // if the score already exists lets redo the score
+            const existingScore = scoresMap.get(item) || 0;
+            // m is the ranking constant; go watch this video: https://www.youtube.com/watch?v=px4YBYrz0NU&ab_channel=OpenSourceConnections
+            // if you want to learn more
+            const rrfScore = 1 / (rank + m);
+            scoresMap.set(item, existingScore + rrfScore);
+        });
+    };
+    addScores(results1.results, scores)
+    addScores(results2.results, scores)
+
+    const results = Array.from(scores.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, numResults)
+        .map((entry) => entry[0])
+
+    return productSemanticSearchResults.parse({
+        numResults: results.length,
+        columns: ["RETAILER_PRODUCT_ID"],
+        results: results
+    })
+}
+
 export const productRouter = createTRPCRouter({
     list: publicProcedure
         .query(async () => {
@@ -100,8 +157,11 @@ export const productRouter = createTRPCRouter({
     search: publicProcedure
         .input(searchQuery)
         .query(async ({input}) => {
+            // fake hybrid search
             if (input.searchQuery.length > 0) {
-                return await fetchData(input.searchQuery, input.numResults)
+                const textResults = await searchProducts(input.searchQuery, input.numResults)
+                const semanticResults = await fetchData(input.searchQuery, input.numResults)
+                return rrf(textResults, semanticResults, 60, input.numResults)
             }
             return null
         })
