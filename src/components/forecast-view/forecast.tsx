@@ -58,9 +58,9 @@ export function ForecaseViz({productId}: {
     const createSeries = (data: ForecastDBModel[], forecastType: string) => {
         return {
             weeks: data.map(item => `Week ${item.WEEK}`),
-            unitsSold: data.map(item => item.STATUS == forecastType ? parseInt(item.UNITS_SOLD) : null),
-            unitsOnHand: data.map(item => item.STATUS == forecastType ? parseInt(item.UNITS_ON_HAND) : null),
-            outOfStock: data.map(item => item.OUT_OF_STOCK === "true")
+            unitsSold: data.map(item => item.STATUS == forecastType ? item.UNITS_SOLD : null),
+            unitsOnHand: data.map(item => item.STATUS == forecastType ? item.UNITS_ON_HAND : null),
+            outOfStock: data.map(item => item.OUT_OF_STOCK === true)
         };
     };
     const actuals = createSeries(data, "actuals");
