@@ -3,7 +3,7 @@
 import {ColumnDef} from "@tanstack/react-table"
 import {Product} from "@/components/product-view/schema/schema"
 import {DataTableColumnHeader} from "./data-table-column-headers"
-import {DataTableRowActions} from "./data-table-row-actions"
+import {DataTableRowActions, ViewForecastRowActions} from "./data-table-row-actions"
 import Image from "next/image";
 import {Badge} from "@/components/ui/badge";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -11,7 +11,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 export const columns: ColumnDef<Product>[] = [
     {
         id: "url",
-        header: ({ table }) => (
+        header: () => (
             <></>
         ),
         cell: ({ row }) => (
@@ -58,6 +58,7 @@ export const columns: ColumnDef<Product>[] = [
         enableHiding: false,
     },
     {
+        id: "status",
         accessorKey: "status",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Status"/>
@@ -96,3 +97,27 @@ export const columns: ColumnDef<Product>[] = [
         cell: ({row}) => <DataTableRowActions row={row}/>,
     },
 ]
+
+export const activeColumns = [...columns].map((column) => {
+  if (column.id === "status")  {
+      return {
+          accessorKey: "status",
+          header: ({column}) => (
+              <DataTableColumnHeader column={column} title="Status"/>
+          ),
+          cell: () => <div className="w-[80px]">active</div>,
+          enableSorting: false,
+          enableHiding: false,
+          filterFn: (row, id, value) => {
+              return value.includes(row.getValue(id))
+          },
+      } as ColumnDef<Product>
+  }
+  if (column.id === "actions") {
+        return {
+            id: "actions",
+            cell: ({row}) => <ViewForecastRowActions row={row}/>,
+        } as ColumnDef<Product>
+  }
+    return column
+})

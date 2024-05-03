@@ -1,6 +1,6 @@
-import {Dashboard} from "@/components/product-view/product-list";
+import {ProductList} from "@/components/product-view/product-list";
 
 
 export default function Home() {
-  return <Dashboard/>
+  return <ProductList/>
 }

@@ -4,15 +4,17 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/comp
 import {Input} from "@/components/ui/input"
 import {Tabs, TabsContent, TabsList, TabsTrigger,} from "@/components/ui/tabs"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import * as React from "react";
 import {ChangeEvent, useEffect, useState} from "react";
 import {DataTable} from "@/components/product-view/table/data-table";
-import {columns} from "@/components/product-view/table/columns";
+import {activeColumns, columns} from "@/components/product-view/table/columns";
 import {Separator} from "@/components/ui/separator";
 import {Product} from "@/components/product-view/schema/schema";
 import {Skeleton} from "@/components/ui/skeleton";
 import {api} from "@/trpc/react";
 import {ProductDBModel} from "@/server/api/routers/product";
-import {openSignal} from "@/components/product-view/product-copy-edit-view";
+import {openSignal, ProductEditModal} from "@/components/product-view/product-copy-edit-view";
+import {displayForecastSignal, ProductForecastModal} from "@/components/forecast-view/forecast";
 
 function useDebounce(value: string, delay: number) {
     // only update debounced value if value changes
@@ -49,7 +51,38 @@ function dataToViewModel(data: ProductDBModel): Product {
     }
 }
 
-export function Dashboard() {
+class SeededRandom {
+    private seed: number;
+
+    constructor(seed: number) {
+        this.seed = seed;
+    }
+
+    nextFloat(): number {
+        const x = Math.sin(this.seed++) * 10000;
+        return x - Math.floor(x);
+    }
+}
+
+function shuffleArray(array: Product[], seed: number) {
+    let currentIndex = array.length, randomIndex;
+
+    const random = new SeededRandom(seed);
+
+    while (currentIndex !== 0) {
+
+        randomIndex = Math.floor(random.nextFloat() * currentIndex);
+        currentIndex--;
+
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+}
+
+
+export function ProductList() {
     const [_, setProductType] = useState("Draft")
     const [input, setInput] = useState("")
     const debouncedSearchTerm = useDebounce(input, 500);
@@ -127,19 +160,19 @@ export function Dashboard() {
 
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <Tabs defaultValue="Draft" onValueChange={setProductType}>
+            <Tabs defaultValue="Active" onValueChange={setProductType}>
                 <div className="flex items-center">
                     <TabsList>
-                        <TabsTrigger value="Active" disabled>Active</TabsTrigger>
+                        <TabsTrigger value="Active">Active</TabsTrigger>
                         <TabsTrigger value="Draft">Draft</TabsTrigger>
                     </TabsList>
                 </div>
                 <TabsContent value="Draft">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Products</CardTitle>
+                            <CardTitle>Draft Products</CardTitle>
                             <CardDescription>
-                                Manage your products and view their sales performance.
+                                Manage your draft products and generate product copy.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -165,7 +198,7 @@ export function Dashboard() {
                             </TooltipProvider>
                             {debouncedSearchTerm && <div className="text-xs text-muted-foreground pb-4">
                                 Showing <strong>1-10</strong> of <strong>{searchResults?.numResults}</strong>{" "}
-                                products from search: {debouncedSearchTerm}
+                                products from semantic search: {debouncedSearchTerm}
                             </div>}
                             <Separator/>
                             <div className={"pt-2"}>
@@ -180,7 +213,54 @@ export function Dashboard() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+                <TabsContent value="Active">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Active Products</CardTitle>
+                            <CardDescription>
+                                Manage your active products and see visualize the forecasts.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="relative ml-auto flex-1 md:grow-0 mb-2">
+                                            <Search
+                                                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"/>
+                                            <Input
+                                                type="search"
+                                                placeholder="Semantic Search..."
+                                                className="w-full rounded-lg bg-background pl-8"
+                                                onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                                            />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        Search powered by databricks vector database
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            {debouncedSearchTerm && <div className="text-xs text-muted-foreground pb-4">
+                                Showing <strong>1-10</strong> of <strong>{searchResults?.numResults}</strong>{" "}
+                                products from semantic search: {debouncedSearchTerm}
+                            </div>}
+                            <Separator/>
+                            <div className={"pt-2"}>
+                                <DataTable columns={loadingProducts ? loadingColumns : activeColumns}
+                                           data={loadingProducts ? loadingFakeData : shuffleArray([...products], 42)}
+                                           onRowClick={(row) => {
+                                               if (!loadingProducts) {
+                                                   displayForecastSignal.value = row
+                                               }
+                                           }}/>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
+            <ProductEditModal/>
+            <ProductForecastModal/>
         </main>
     )
 }

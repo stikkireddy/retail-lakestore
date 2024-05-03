@@ -4,8 +4,6 @@ import * as React from "react"
 import {
     ColumnDef,
     ColumnFiltersState,
-    SortingState,
-    VisibilityState,
     flexRender,
     getCoreRowModel,
     getFacetedRowModel,
@@ -13,21 +11,16 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    SortingState,
     useReactTable,
+    VisibilityState,
 } from "@tanstack/react-table"
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
-import {ProductEditModal} from "@/components/product-view/product-copy-edit-view";
+import {useRouter} from "next/navigation"
+import {DataTablePagination} from "./data-table-pagination"
+import {DataTableToolbar} from "./data-table-toolbar"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -47,7 +40,6 @@ export function DataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
-
     const table = useReactTable({
         data,
         columns,
@@ -106,7 +98,9 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
-                                    onClick={() => onRowClick(row.original)}
+                                    onClick={() => {
+                                        onRowClick(row.original)
+                                    }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id} className={cell.column.id === "url" ? "w-[92px] h-[92px] !p-0.5" : ""}>
@@ -132,7 +126,6 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <DataTablePagination table={table} />
-            <ProductEditModal/>
         </div>
     )
 }

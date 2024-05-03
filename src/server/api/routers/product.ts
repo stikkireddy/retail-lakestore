@@ -87,16 +87,18 @@ const getCachedProducts = unstable_cache(
     ['products-list'],
 );
 
+const searchQuery = z.object({
+    searchQuery: z.string(),
+    numResults: z.number().default(10)
+})
+
 export const productRouter = createTRPCRouter({
     list: publicProcedure
         .query(async () => {
             return await getCachedProducts()
         }),
     search: publicProcedure
-        .input(z.object({
-            searchQuery: z.string(),
-            numResults: z.number().optional().default(10)
-        }))
+        .input(searchQuery)
         .query(async ({input}) => {
             if (input.searchQuery.length > 0) {
                 return await fetchData(input.searchQuery, input.numResults)
