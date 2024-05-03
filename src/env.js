@@ -15,6 +15,7 @@ export const env = createEnv({
     DATABRICKS_DATA_HTTP_PATH: z.string(),
     DATABRICKS_VECTOR_INDEX_NAME: z.string(),
     DATABRICKS_PRODUCT_TABLE: z.string(),
+    DATABRICKS_FORECAST_TABLE: z.string(),
     DATABRICKS_VECTOR_INDEX_COLUMNS: z.string(),
   },
 
@@ -41,6 +42,7 @@ export const env = createEnv({
     DATABRICKS_VECTOR_INDEX_NAME: process.env.DATABRICKS_VECTOR_INDEX_NAME,
     DATABRICKS_VECTOR_INDEX_COLUMNS: process.env.DATABRICKS_VECTOR_INDEX_COLUMNS,
     DATABRICKS_PRODUCT_TABLE: process.env.DATABRICKS_PRODUCT_TABLE,
+    DATABRICKS_FORECAST_TABLE: process.env.DATABRICKS_FORECAST_TABLE,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
