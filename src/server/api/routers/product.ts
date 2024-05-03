@@ -3,7 +3,7 @@ import {createTRPCRouter, publicProcedure} from "@/server/api/trpc";
 import {env} from "@/env";
 import {unstable_cache} from "next/cache";
 import {DBSQLClient} from "@databricks/sql";
-import {TfIdf} from 'natural';
+import {PorterStemmer, TfIdf, WordTokenizer} from 'natural';
 
 const productDBSchema = z.object({
     RETAILER_PRODUCT_ID: z.string(),
@@ -95,9 +95,12 @@ const searchQuery = z.object({
 const getTFIDF = async () => {
         const tfidf = new TfIdf();
         const products = await getCachedProducts()
+        const tokenizer = new WordTokenizer();
         products.forEach((product) => {
             if (product.RETAILER_PRODUCT_NAME) {
-                tfidf.addDocument(product.RETAILER_PRODUCT_NAME.toLowerCase(), product.RETAILER_PRODUCT_ID)
+                const tokens = tokenizer.tokenize(product.RETAILER_PRODUCT_NAME.toLowerCase());
+                const stemmedTokens = tokens.map(token => PorterStemmer.stem(token));
+                tfidf.addDocument(stemmedTokens.join(' '), product.RETAILER_PRODUCT_ID);
             }
         })
         return tfidf
@@ -106,7 +109,10 @@ const getTFIDF = async () => {
 const searchProducts = async (searchQuery: string, numResults: number = 10) => {
     const search = await getTFIDF()
     let scores: {i: number, measure: number, key: string | Record<string, any> | undefined}[] = []
-    search.tfidfs(searchQuery.toLowerCase(), (i, measure, key) => {
+    const tokenizer = new WordTokenizer();
+    const queryTokens = tokenizer.tokenize(searchQuery.toLowerCase());
+    const stemmedQuery = queryTokens.map(token => PorterStemmer.stem(token)).join(' ');
+    search.tfidfs(stemmedQuery, (i, measure, key) => {
         scores.push({i, measure, key})
     })
     scores = scores.sort((a, b) => b.measure - a.measure)
@@ -142,6 +148,7 @@ function rrf(results1: ProductSearchResults, results2: ProductSearchResults, m =
         .slice(0, numResults)
         .map((entry) => entry[0])
 
+    console.log("Computed hybrid scores!")
     return productSemanticSearchResults.parse({
         numResults: results.length,
         columns: ["RETAILER_PRODUCT_ID"],
