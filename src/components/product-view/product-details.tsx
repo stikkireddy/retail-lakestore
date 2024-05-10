@@ -47,7 +47,7 @@ export default function ProductDetails() {
                             disabled
                         />
                     </div>
-                    <div className="grid gap-3">
+                    <div className="grid gap-3 hidden">
                         <Label htmlFor="aiDescription">AI Generated Description</Label>
                         <Textarea
                             id="aiDescription"

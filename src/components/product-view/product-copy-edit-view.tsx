@@ -97,8 +97,34 @@ export default function ProductEditView() {
         }
     }, [generateAll]);
 
+    const [finalDescription, setFinalDescription] = React.useState<string>("")
+
+    const [finalDescriptionLoading, setFinalDescriptionLoading] = React.useState<boolean>(false)
+
+    const onClick = async () => {
+        if (finalDescription && openSignal.value) {
+            setFinalDescriptionLoading(true)
+            if (openSignal.value.providedDescription !== finalDescription) {
+                openSignal.value.providedDescription = finalDescription
+            }
+            setTimeout(() => {
+                setAccordionValue("product-details")
+                setFinalDescriptionLoading(false)
+            }, 1000)
+        }
+    }
+
+    const [accordionValue, setAccordionValue] = React.useState<string>("product-details")
+
+
+
     return (
-        <Accordion type="single" defaultValue="product-details" collapsible>
+        <Accordion type="single" defaultValue="product-details"
+                   value={accordionValue}
+                     onValueChange={(value) => {
+                          setAccordionValue(value)
+                     }}
+                   collapsible>
             <AccordionItem value="product-details">
                 <AccordionTrigger>Product Details</AccordionTrigger>
                 <AccordionContent>
@@ -170,6 +196,25 @@ export default function ProductEditView() {
                                                                parentTriggerGenerate={generateAll}/>
                                     </div>
                                 </div>
+                                <Label htmlFor="final-description">Final Description</Label>
+                                <Textarea
+                                    id="final-description"
+                                    className="min-h-32"
+                                    // defaultValue={finalDescription}
+                                    value={finalDescription}
+                                    onChange={(e) => {
+                                        setFinalDescription(e.target.value)
+                                    }}
+                                />
+                                <Button
+                                    onClick={onClick}
+                                    disabled={finalDescriptionLoading}
+                                >
+                                    {finalDescriptionLoading && <Loader2
+                                        className={'h-4 w-4 mr-2 text-background/60 animate-spin'}
+                                    />}
+                                    Save Description
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>

@@ -174,10 +174,10 @@ export function ProductList() {
 
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <Tabs defaultValue="Active" onValueChange={setProductType}>
+            <Tabs defaultValue="Draft" onValueChange={setProductType}>
                 <div className="flex items-center">
                     <TabsList>
-                        <TabsTrigger value="Active">Active</TabsTrigger>
+                        <TabsTrigger value="Active" disabled>Active</TabsTrigger>
                         <TabsTrigger value="Draft">Draft</TabsTrigger>
                     </TabsList>
                 </div>
