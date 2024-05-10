@@ -177,7 +177,7 @@ export function ProductList() {
             <Tabs defaultValue="Draft" onValueChange={setProductType}>
                 <div className="flex items-center">
                     <TabsList>
-                        <TabsTrigger value="Active" disabled>Active</TabsTrigger>
+                        <TabsTrigger value="Active">Active</TabsTrigger>
                         <TabsTrigger value="Draft">Draft</TabsTrigger>
                     </TabsList>
                 </div>
