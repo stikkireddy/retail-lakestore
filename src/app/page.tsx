@@ -1,9 +1,5 @@
-
-'use client'
-
-import { useRouter } from 'next/navigation'
+import {HomeRedirect} from "@/components/home";
 
 export default function Home() {
-    const router = useRouter()
-    router.push("/products")
+    return <HomeRedirect/>;
 }
