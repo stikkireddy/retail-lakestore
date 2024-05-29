@@ -14,7 +14,10 @@ import {Input} from "@/components/ui/input";
 import {addToCartIfNotExists} from "@/components/cart-view/cart-list";
 
 function SearchLoadingSkeleton(props: {nItems: number}) {
-    const range =  [...Array(props.nItems).keys()]
+    const range =  []
+    for (let i = 0; i < props.nItems; i++) {
+        range.push(i)
+    }
     return range.map((idx) => {
         return <div key={idx} className="flex items-center gap-4 p-2 transition-colors w-full">
             <Skeleton className="h-[72px] w-[72px]"/>
