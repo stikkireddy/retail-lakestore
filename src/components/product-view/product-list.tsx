@@ -17,7 +17,7 @@ import {openSignal, ProductEditModal} from "@/components/product-view/product-co
 import {displayForecastSignal, ProductForecastModal} from "@/components/forecast-view/forecast";
 import {cn} from "@/lib/utils";
 
-function useDebounce(value: string, delay: number) {
+export function useDebounce(value: string, delay: number) {
     // only update debounced value if value changes
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -34,7 +34,7 @@ function useDebounce(value: string, delay: number) {
     return debouncedValue;
 }
 
-function dataToViewModel(data: ProductDBModel): Product {
+export function dataToViewModel(data: ProductDBModel): Product {
     return {
         id: data.RETAILER_PRODUCT_ID,
         name: data.RETAILER_PRODUCT_NAME ?? "",

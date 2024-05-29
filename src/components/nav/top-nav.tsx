@@ -1,3 +1,4 @@
+"use client"
 import {MobileNav} from "@/components/nav/mobile-nav";
 import {
     Breadcrumb,
@@ -18,8 +19,36 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
+import {usePathname} from "next/navigation";
+
+export function ProductsCrumbs(props: {productType: string}) {
+    return <>
+    <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+            <Link href="#">Products</Link>
+        </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator/>
+    <BreadcrumbItem>
+        <BreadcrumbPage>{props.productType} Products</BreadcrumbPage>
+    </BreadcrumbItem></>
+}
+
+export function CartCrumbs() {
+    return <>
+        <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+                <Link href="#">Cart</Link>
+            </BreadcrumbLink>
+        </BreadcrumbItem>
+    </>
+
+}
 
 export function TopNav(props: { productType: string }) {
+    const pathname = usePathname()
+    const isCart = pathname === "/cart"
+    const isProduct = pathname === "/products"
     return <>
         <MobileNav/>
         <Breadcrumb className="hidden md:flex">
@@ -30,15 +59,8 @@ export function TopNav(props: { productType: string }) {
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator/>
-                <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                        <Link href="#">Products</Link>
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator/>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{props.productType} Products</BreadcrumbPage>
-                </BreadcrumbItem>
+                {isProduct && <ProductsCrumbs productType={props.productType}/>}
+                {isCart && <CartCrumbs/>}
             </BreadcrumbList>
         </Breadcrumb>
         <div className="relative ml-auto flex-1 md:grow-0">

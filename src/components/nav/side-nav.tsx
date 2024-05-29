@@ -1,9 +1,15 @@
+"use client"
+
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import Link from "next/link";
 import Image from "next/image";
 import {Home, LineChart, Package, Settings, ShoppingCart, Users2} from "lucide-react";
+import { usePathname } from 'next/navigation'
 
 export function SideNav() {
+    const pathname = usePathname()
+    const selectedClassName = "flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+    const unselectedClassName = "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
     return <>
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
             <TooltipProvider delayDuration={200}>
@@ -35,20 +41,20 @@ export function SideNav() {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Link
-                            href="#"
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                            href="/cart"
+                            className={pathname === "/cart" ? selectedClassName : unselectedClassName}
                         >
                             <ShoppingCart className="h-5 w-5"/>
-                            <span className="sr-only">Orders</span>
+                            <span className="sr-only">Cart</span>
                         </Link>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Orders</TooltipContent>
+                    <TooltipContent side="right">Cart</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Link
-                            href="#"
-                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                            href="/products"
+                            className={pathname === "/products" ? selectedClassName : unselectedClassName}
                         >
                             <Package className="h-5 w-5"/>
                             <span className="sr-only">Products</span>

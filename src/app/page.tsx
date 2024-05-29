@@ -1,6 +1,9 @@
-import {ProductList} from "@/components/product-view/product-list";
 
+'use client'
+
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  return <ProductList/>
+    const router = useRouter()
+    router.push("/products")
 }
