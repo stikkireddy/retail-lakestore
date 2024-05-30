@@ -57,6 +57,7 @@ export function makePrompt(products: Product[]) {
      Stick to one gender for your searches. If the selected item is boys stick to boys and if its women stick to women.
      Do not provide same category of items!
      Ensure response is valid json and just json!
+     Keep in mind the store only shoes, pants, shorts, shirts. Stick to missing categories in the cart!
      The cart contains: ${productsString}
      The recommendations are:
     `
@@ -180,12 +181,11 @@ function CartRecommendations({searchString}: {searchString: string}) {
             recommendedProducts.value = []
         }
         if (searchResults && data) {
-            const filderedProducts = searchResults.results.slice(0, 5).map((result) => {
+            recommendedProducts.value = searchResults.results.slice(0, 5).map((result) => {
                 return data.find((product) => product.RETAILER_PRODUCT_ID === result) as ProductDBModel
             }).filter((v) => v != null).map((p) => {
                 return dataToViewModel(p)
             })
-            recommendedProducts.value = filderedProducts
         }
     }, [searchResults, searchLoading, data, isLoading]);
 
@@ -197,6 +197,7 @@ function CartRecommendations({searchString}: {searchString: string}) {
                 {
                     !searchLoading && recommendedProducts.value.map((product, index) => {
                         return <div key={index}
+                                    onClick={() => addToCartIfNotExists(product)}
                                     className="flex items-center gap-4 p-2 bg-background hover:bg-gray-500/10 transition-colors w-full">
                             <CartProductItem product={product}/>
                         </div>
